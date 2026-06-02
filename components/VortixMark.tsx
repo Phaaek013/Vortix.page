@@ -1,10 +1,10 @@
 import { useId } from "react";
-import { VIEWBOX, ARMS, LOGO_FROM, LOGO_TO } from "@/lib/spiralData";
+import { VIEWBOX, ARMS } from "@/lib/spiralData";
 
 type Props = {
   className?: string;
   style?: React.CSSProperties;
-  /** Emerald gradient endpoints (default = cores nativas da logo). */
+  /** Emerald gradient endpoints. Default = verde da identidade Vortix. */
   from?: string;
   to?: string;
   title?: string;
@@ -21,8 +21,8 @@ type Props = {
 export default function VortixMark({
   className,
   style,
-  from = LOGO_FROM,
-  to = LOGO_TO,
+  from = "#3DD9A0",
+  to = "#2BB98A",
   title = "Vortix",
 }: Props) {
   const uid = useId().replace(/:/g, "");
