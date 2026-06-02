@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen:spiral": "python3 scripts/gen-spiral.py"
+    "gen:spiral": "node scripts/gen-spiral.mjs"
   },
   "dependencies": {
     "framer-motion": "^11.3.19",

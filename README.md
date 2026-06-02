@@ -27,15 +27,16 @@ npm run dev      # http://localhost:3000
 
 ## O espiral (identidade)
 
-O coração da marca é o **vórtex verde esmeralda** — recriado como **SVG
-vetorial de verdade** (paths matemáticos), não um raster. É um disco esmeralda
-sólido com um canal de dupla espiral vazado (transparente), 2 braços com pontas
-arredondadas em "onda", girando lentamente de forma contínua e reagindo de
-forma sutil ao mouse e ao scroll.
+O coração da marca é o **vórtex verde esmeralda** — a logo oficial em **SVG
+vetorial de verdade** (dois `<path>` reais), não um raster. São 2 braços que
+partem do centro e se enrolam para fora, cada um terminando numa ponta
+arredondada em "onda". O espaço entre os braços é transparente, girando
+lentamente de forma contínua e reagindo de forma sutil ao mouse e ao scroll.
 
-- `lib/spiralData.ts` — paths gerados (fonte única de verdade)
-- `scripts/gen-spiral.py` — gerador paramétrico do vetor (`npm run gen:spiral`)
-- `components/VortixMark.tsx` — o vetor puro (disco + máscara de canal)
+- `public/vortix-mark.svg` — a logo oficial vetorial (fonte única de verdade)
+- `lib/spiralData.ts` — paths extraídos do SVG para o componente React
+- `scripts/gen-spiral.mjs` — regenera o data file a partir do SVG (`npm run gen:spiral`)
+- `components/VortixMark.tsx` — o vetor puro (os dois braços + gradiente)
 - `components/VortixSpiral.tsx` — o vetor vivo (rotação + mouse + scroll)
 
 ## Roadmap (fases)

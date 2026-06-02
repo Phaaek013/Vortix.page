@@ -1,66 +1,54 @@
 import { useId } from "react";
-import { DISC, CHANNEL_PATHS, CHANNEL_CAPS } from "@/lib/spiralData";
+import { VIEWBOX, ARMS, LOGO_FROM, LOGO_TO } from "@/lib/spiralData";
 
 type Props = {
   className?: string;
   style?: React.CSSProperties;
-  /** Emerald gradient endpoints. */
+  /** Emerald gradient endpoints (default = cores nativas da logo). */
   from?: string;
   to?: string;
   title?: string;
 };
 
 /**
- * VortixMark — the true-vector Vortix vortex.
+ * VortixMark — a logo oficial da Vortix, vetorial.
  *
- * A solid emerald disc with a white (transparent) double-spiral channel carved
- * out via a mask. Both arms are real, math-defined paths (Archimedean spiral
- * ribbons with rounded caps), 2-fold rotationally symmetric, ending in the
- * rounded "wave" tips. The channel is transparent, so on a dark surface the
- * background shows through — exactly like the original logo on its backdrop.
+ * Dois braços (paths reais) que partem do centro e se enrolam para fora,
+ * cada um terminando numa ponta arredondada em "onda". O espaço entre os
+ * braços é transparente — num fundo escuro, o backdrop aparece através dele,
+ * exatamente como o desenho original.
  */
 export default function VortixMark({
   className,
   style,
-  from = "#3DD9A0",
-  to = "#2BB98A",
+  from = LOGO_FROM,
+  to = LOGO_TO,
   title = "Vortix",
 }: Props) {
   const uid = useId().replace(/:/g, "");
   const gradId = `vx-grad-${uid}`;
-  const maskId = `vx-mask-${uid}`;
 
   return (
     <svg
-      viewBox="0 0 200 200"
+      viewBox={VIEWBOX}
       className={className}
       style={style}
       role="img"
       aria-label={title}
+      preserveAspectRatio="xMidYMid meet"
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor={from} />
-          <stop offset="1" stopColor={to} />
+        <linearGradient id={gradId} x1="10%" y1="10%" x2="90%" y2="90%">
+          <stop offset="0%" stopColor={from} />
+          <stop offset="100%" stopColor={to} />
         </linearGradient>
-        <mask id={maskId}>
-          <circle cx={DISC.cx} cy={DISC.cy} r={DISC.r} fill="white" />
-          {CHANNEL_PATHS.map((d, i) => (
-            <path key={`p${i}`} d={d} fill="black" />
-          ))}
-          {CHANNEL_CAPS.map((c, i) => (
-            <circle key={`c${i}`} cx={c.cx} cy={c.cy} r={c.r} fill="black" />
-          ))}
-        </mask>
       </defs>
-      <circle
-        cx={DISC.cx}
-        cy={DISC.cy}
-        r={DISC.r}
-        fill={`url(#${gradId})`}
-        mask={`url(#${maskId})`}
-      />
+      <g fill={`url(#${gradId})`}>
+        {ARMS.map((d, i) => (
+          <path key={`arm-${i}`} d={d} />
+        ))}
+      </g>
     </svg>
   );
 }
