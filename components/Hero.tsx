@@ -1,51 +1,47 @@
 "use client";
 
-import { useId } from "react";
 import { motion } from "framer-motion";
-import VortixMark from "./VortixMark";
+import VortixSpiral from "./VortixSpiral";
 
 /* ─────────────────────────────────────────────
-   SpiralCapsule
-   Pill-shaped form with a squished VortixMark
-   spinning inside — glassy depth, like a spiral
-   disc seen at an oblique angle.
+   FloatingSpiral
+   The real VortixSpiral tilted in 3D (rotateX)
+   so it looks like a disc lying in perspective,
+   matching the depth feel of the reference.
 ───────────────────────────────────────────── */
-type CapsuleProps = {
+type SpiralProps = {
   className?: string;
   delay?: number;
-  width?: number;
-  height?: number;
-  rotate?: number;
-  opacity?: number;
+  size?: number;
   spin?: number;
-  glowLeft?: boolean;
+  rotateX?: number; // tilt toward viewer (deg) — creates depth
+  rotateZ?: number; // in-plane rotation for variety
+  opacity?: number;
+  glow?: boolean;
 };
 
-function SpiralCapsule({
+function FloatingSpiral({
   className = "",
   delay = 0,
-  width = 500,
-  height = 115,
-  rotate = 0,
-  opacity = 0.7,
-  spin = 58,
-  glowLeft = false,
-}: CapsuleProps) {
-  const uid = useId().replace(/:/g, "");
-  const r = height / 2;
-
+  size = 300,
+  spin = 60,
+  rotateX = 72,
+  rotateZ = 0,
+  opacity = 0.65,
+  glow = false,
+}: SpiralProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: -140, rotate: rotate - 14 }}
-      animate={{ opacity, y: 0, rotate }}
+      initial={{ opacity: 0, y: -100, rotateX, rotateZ: rotateZ - 14 }}
+      animate={{ opacity, y: 0, rotateX, rotateZ }}
       transition={{
-        duration: 2.6,
+        duration: 2.4,
         delay,
         ease: [0.23, 0.86, 0.39, 0.96],
-        opacity: { duration: 1.4 },
+        opacity: { duration: 1.3 },
       }}
       className={`absolute ${className}`}
-      style={{ width, height }}
+      style={{ perspective: 700, transformStyle: "preserve-3d" }}
     >
       <motion.div
         animate={{ y: [0, 16, 0] }}
@@ -53,63 +49,16 @@ function SpiralCapsule({
           duration: 13,
           repeat: Infinity,
           ease: "easeInOut",
-          delay: delay * 0.6,
+          delay: delay * 0.5,
         }}
-        style={{ width: "100%", height: "100%", position: "relative" }}
       >
-        {/* Pill shell */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: r,
-            overflow: "hidden",
-            backdropFilter: "blur(3px)",
-            WebkitBackdropFilter: "blur(3px)",
-            border: "1px solid rgba(255,255,255,0.10)",
-            boxShadow: glowLeft
-              ? "0 6px 40px rgba(61,217,160,0.10), inset 0 1px 0 rgba(255,255,255,0.07)"
-              : "inset 0 1px 0 rgba(255,255,255,0.06)",
-            background: glowLeft
-              ? "linear-gradient(90deg,rgba(61,217,160,0.09) 0%,rgba(13,13,18,0.55) 55%,transparent 100%)"
-              : "linear-gradient(90deg,rgba(255,255,255,0.04) 0%,rgba(13,13,18,0.50) 50%,transparent 100%)",
-          }}
-        >
-          {/* Squished spiral spinning inside */}
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: spin, ease: "linear", repeat: Infinity }}
-            style={{
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              width: height * 1.7,
-              height: height * 1.7,
-              transform: "translate(-50%,-50%)",
-              opacity: 0.28,
-            }}
-          >
-            <VortixMark
-              className="w-full h-full"
-              from={glowLeft ? "#3DD9A0" : "rgba(61,217,160,0.9)"}
-              to={glowLeft ? "#2BB98A" : "rgba(43,185,138,0.5)"}
-            />
-          </motion.div>
-
-          {/* Top-edge light reflection */}
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: "38%",
-              background:
-                "linear-gradient(180deg,rgba(255,255,255,0.05) 0%,transparent 100%)",
-              borderRadius: `${r}px ${r}px 0 0`,
-            }}
-          />
-        </div>
+        <VortixSpiral
+          size={size}
+          spin={spin}
+          glow={glow}
+          tilt={0}
+          scroll={0}
+        />
       </motion.div>
     </motion.div>
   );
@@ -129,81 +78,81 @@ const fadeUp = (i: number) => ({
   },
 });
 
-/* ─────────────────────────────────────────────
-   Hero
-───────────────────────────────────────────── */
 export default function Hero() {
   return (
     <section className="grain relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-ink-900">
 
-      {/* Ambient */}
+      {/* Ambient glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 70% 60% at 50% 48%, rgba(61,217,160,0.045) 0%, transparent 70%)",
+            "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(61,217,160,0.045) 0%, transparent 70%)",
         }}
       />
 
-      {/* ── Capsules ── */}
+      {/* ── Spirals positioned like the reference capsules ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
 
-        {/* TOP-LEFT — large, slight positive tilt */}
-        <SpiralCapsule
+        {/* TOP-LEFT — large, tilted ~72° toward viewer, slight Z-rotate */}
+        <FloatingSpiral
           delay={0.25}
-          width={560}
-          height={124}
-          rotate={12}
-          opacity={0.68}
-          glowLeft
+          size={400}
           spin={52}
-          className="left-[-8%] top-[18%] md:left-[-4%] md:top-[22%]"
+          rotateX={72}
+          rotateZ={10}
+          opacity={0.60}
+          glow={false}
+          className="left-[-12%] top-[14%] md:left-[-6%] md:top-[18%]"
         />
 
-        {/* TOP-RIGHT — medium, negative tilt */}
-        <SpiralCapsule
+        {/* TOP-RIGHT — medium, mirrored tilt */}
+        <FloatingSpiral
           delay={0.45}
-          width={420}
-          height={100}
-          rotate={-16}
-          opacity={0.55}
-          spin={66}
-          className="right-[-6%] top-[10%] md:right-[-2%] md:top-[14%]"
+          size={300}
+          spin={68}
+          rotateX={68}
+          rotateZ={-14}
+          opacity={0.50}
+          glow={false}
+          className="right-[-8%] top-[8%] md:right-[-2%] md:top-[12%]"
         />
 
-        {/* BOTTOM-RIGHT — large, glow */}
-        <SpiralCapsule
+        {/* BOTTOM-RIGHT — large, emerald glow */}
+        <FloatingSpiral
           delay={0.35}
-          width={500}
-          height={118}
-          rotate={-10}
-          opacity={0.62}
-          glowLeft
+          size={380}
           spin={48}
-          className="right-[-7%] bottom-[12%] md:right-[-3%] md:bottom-[15%]"
+          rotateX={74}
+          rotateZ={-8}
+          opacity={0.58}
+          glow
+          className="right-[-10%] bottom-[8%] md:right-[-4%] md:bottom-[12%]"
         />
 
         {/* BOTTOM-LEFT — medium */}
-        <SpiralCapsule
-          delay={0.6}
-          width={340}
-          height={86}
-          rotate={20}
-          opacity={0.45}
-          spin={74}
-          className="left-[4%] bottom-[8%] md:left-[8%] md:bottom-[11%]"
+        <FloatingSpiral
+          delay={0.60}
+          size={260}
+          spin={76}
+          rotateX={70}
+          rotateZ={18}
+          opacity={0.42}
+          glow={false}
+          className="left-[3%] bottom-[6%] md:left-[7%] md:bottom-[10%]"
         />
 
         {/* TOP-CENTER-RIGHT — small */}
-        <SpiralCapsule
+        <FloatingSpiral
           delay={0.72}
-          width={220}
-          height={60}
-          rotate={-26}
-          opacity={0.35}
-          spin={88}
-          className="right-[20%] top-[6%] md:right-[24%] md:top-[8%]"
+          size={180}
+          spin={90}
+          rotateX={65}
+          rotateZ={-22}
+          opacity={0.32}
+          glow={false}
+          className="right-[18%] top-[5%] md:right-[22%] md:top-[7%]"
         />
       </div>
 
