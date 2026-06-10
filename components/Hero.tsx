@@ -1,68 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import VortixSpiral from "./VortixSpiral";
-
-/* ─────────────────────────────────────────────
-   FloatingSpiral
-   The real VortixSpiral tilted in 3D (rotateX)
-   so it looks like a disc lying in perspective,
-   matching the depth feel of the reference.
-───────────────────────────────────────────── */
-type SpiralProps = {
-  className?: string;
-  delay?: number;
-  size?: number;
-  spin?: number;
-  rotateX?: number; // tilt toward viewer (deg) — creates depth
-  rotateZ?: number; // in-plane rotation for variety
-  opacity?: number;
-  glow?: boolean;
-};
-
-function FloatingSpiral({
-  className = "",
-  delay = 0,
-  size = 300,
-  spin = 60,
-  rotateX = 72,
-  rotateZ = 0,
-  opacity = 0.65,
-  glow = false,
-}: SpiralProps) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -100, rotateX, rotateZ: rotateZ - 14 }}
-      animate={{ opacity, y: 0, rotateX, rotateZ }}
-      transition={{
-        duration: 2.4,
-        delay,
-        ease: [0.23, 0.86, 0.39, 0.96],
-        opacity: { duration: 1.3 },
-      }}
-      className={`absolute ${className}`}
-      style={{ perspective: 700, transformStyle: "preserve-3d" }}
-    >
-      <motion.div
-        animate={{ y: [0, 16, 0] }}
-        transition={{
-          duration: 13,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: delay * 0.5,
-        }}
-      >
-        <VortixSpiral
-          size={size}
-          spin={spin}
-          glow={glow}
-          tilt={0}
-          scroll={0}
-        />
-      </motion.div>
-    </motion.div>
-  );
-}
 
 /* ─── Content fade-up ─── */
 const fadeUp = (i: number) => ({
@@ -78,83 +16,177 @@ const fadeUp = (i: number) => ({
   },
 });
 
+/* ─────────────────────────────────────────────
+   SpiralDecor
+   One instance of the 3D render with a radial
+   mask so the black background dissolves into
+   the page — no hard edges, no clipping.
+───────────────────────────────────────────── */
+type SpiralDecorProps = {
+  style?: React.CSSProperties;
+  size?: number;
+  floatDuration?: number;
+  floatDelay?: number;
+  /** initial rotation angle */
+  initRotate?: number;
+  /** peak rotation at 50% of float loop */
+  peakRotate?: number;
+  /** translate at 50% of float loop */
+  floatX?: number;
+  floatY?: number;
+  opacity?: number;
+  enterDelay?: number;
+};
+
+function SpiralDecor({
+  style,
+  size = 420,
+  floatDuration = 12,
+  floatDelay = 0,
+  initRotate = -6,
+  peakRotate = 4,
+  floatX = -18,
+  floatY = 14,
+  opacity = 1,
+  enterDelay = 0.3,
+}: SpiralDecorProps) {
+  const mask =
+    "radial-gradient(circle at center, #000 42%, rgba(0,0,0,0.92) 58%, transparent 82%)";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.88 }}
+      animate={{ opacity, scale: 1 }}
+      transition={{
+        duration: 1.8,
+        delay: enterDelay,
+        ease: [0.23, 0.86, 0.39, 0.96],
+        opacity: { duration: 1.4 },
+      }}
+      style={{
+        position: "absolute",
+        width: size,
+        height: size,
+        pointerEvents: "none",
+        willChange: "transform",
+        ...style,
+      }}
+    >
+      <motion.div
+        animate={{
+          x: [0, floatX, 0],
+          y: [0, floatY, 0],
+          rotate: [initRotate, peakRotate, initRotate],
+        }}
+        transition={{
+          duration: floatDuration,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: floatDelay,
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          backgroundImage: "url('/assets/vortix-spiral-hero-premium.webp')",
+          backgroundSize: "contain",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          WebkitMaskImage: mask,
+          maskImage: mask,
+        }}
+      />
+    </motion.div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   Hero
+───────────────────────────────────────────── */
 export default function Hero() {
   return (
     <section className="grain relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-ink-900">
 
-      {/* Ambient glow */}
+      {/* Ambient */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(61,217,160,0.045) 0%, transparent 70%)",
+            "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(61,217,160,0.04) 0%, transparent 70%)",
         }}
       />
 
-      {/* ── Spirals positioned like the reference capsules ── */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      {/* ── Spiral instances ── */}
 
-        {/* TOP-LEFT — large, tilted ~72° toward viewer, slight Z-rotate */}
-        <FloatingSpiral
-          delay={0.25}
-          size={400}
-          spin={52}
-          rotateX={72}
-          rotateZ={10}
-          opacity={0.60}
-          glow={false}
-          className="left-[-12%] top-[14%] md:left-[-6%] md:top-[18%]"
-        />
+      {/* TOP-LEFT — large, enters first */}
+      <SpiralDecor
+        size={480}
+        enterDelay={0.2}
+        floatDuration={13}
+        floatDelay={0}
+        initRotate={12}
+        peakRotate={-4}
+        floatX={14}
+        floatY={18}
+        opacity={0.72}
+        style={{ top: "8%", left: "-8%" }}
+      />
 
-        {/* TOP-RIGHT — medium, mirrored tilt */}
-        <FloatingSpiral
-          delay={0.45}
-          size={300}
-          spin={68}
-          rotateX={68}
-          rotateZ={-14}
-          opacity={0.50}
-          glow={false}
-          className="right-[-8%] top-[8%] md:right-[-2%] md:top-[12%]"
-        />
+      {/* TOP-RIGHT — medium */}
+      <SpiralDecor
+        size={340}
+        enterDelay={0.42}
+        floatDuration={11}
+        floatDelay={1.5}
+        initRotate={-18}
+        peakRotate={-4}
+        floatX={-14}
+        floatY={12}
+        opacity={0.58}
+        style={{ top: "6%", right: "-4%" }}
+      />
 
-        {/* BOTTOM-RIGHT — large, emerald glow */}
-        <FloatingSpiral
-          delay={0.35}
-          size={380}
-          spin={48}
-          rotateX={74}
-          rotateZ={-8}
-          opacity={0.58}
-          glow
-          className="right-[-10%] bottom-[8%] md:right-[-4%] md:bottom-[12%]"
-        />
+      {/* BOTTOM-RIGHT — large, main accent */}
+      <SpiralDecor
+        size={460}
+        enterDelay={0.32}
+        floatDuration={14}
+        floatDelay={2.5}
+        initRotate={-6}
+        peakRotate={8}
+        floatX={-20}
+        floatY={-16}
+        opacity={0.78}
+        style={{ bottom: "4%", right: "-6%" }}
+      />
 
-        {/* BOTTOM-LEFT — medium */}
-        <FloatingSpiral
-          delay={0.60}
-          size={260}
-          spin={76}
-          rotateX={70}
-          rotateZ={18}
-          opacity={0.42}
-          glow={false}
-          className="left-[3%] bottom-[6%] md:left-[7%] md:bottom-[10%]"
-        />
+      {/* BOTTOM-LEFT — small */}
+      <SpiralDecor
+        size={260}
+        enterDelay={0.55}
+        floatDuration={10}
+        floatDelay={3.5}
+        initRotate={20}
+        peakRotate={6}
+        floatX={12}
+        floatY={-14}
+        opacity={0.44}
+        style={{ bottom: "10%", left: "4%" }}
+      />
 
-        {/* TOP-CENTER-RIGHT — small */}
-        <FloatingSpiral
-          delay={0.72}
-          size={180}
-          spin={90}
-          rotateX={65}
-          rotateZ={-22}
-          opacity={0.32}
-          glow={false}
-          className="right-[18%] top-[5%] md:right-[22%] md:top-[7%]"
-        />
-      </div>
+      {/* TOP-CENTER-RIGHT — tiny, high up */}
+      <SpiralDecor
+        size={190}
+        enterDelay={0.68}
+        floatDuration={9}
+        floatDelay={4.5}
+        initRotate={-28}
+        peakRotate={-10}
+        floatX={10}
+        floatY={16}
+        opacity={0.32}
+        style={{ top: "3%", right: "22%" }}
+      />
 
       {/* ── Text content ── */}
       <div className="relative z-10 mx-auto max-w-3xl px-6 text-center md:px-8">
