@@ -190,17 +190,8 @@ export default function Hero() {
 
       {/* ── Text content ── */}
       <div className="relative z-10 mx-auto max-w-3xl px-6 text-center md:px-8">
-        <motion.p
-          variants={fadeUp(0)}
-          initial="hidden"
-          animate="visible"
-          className="mb-6 font-body text-[13px] uppercase tracking-[0.18em] text-emerald/70"
-        >
-          Vortix — consultoria técnica
-        </motion.p>
-
         <motion.h1
-          variants={fadeUp(1)}
+          variants={fadeUp(0)}
           initial="hidden"
           animate="visible"
           className="font-display font-bold leading-[1.03] tracking-tightest text-cream"
@@ -212,7 +203,7 @@ export default function Hero() {
         </motion.h1>
 
         <motion.p
-          variants={fadeUp(2)}
+          variants={fadeUp(1)}
           initial="hidden"
           animate="visible"
           className="mx-auto mt-7 max-w-[500px] font-body text-[16px] leading-[1.75] text-mist/70"
@@ -223,7 +214,7 @@ export default function Hero() {
         </motion.p>
 
         <motion.div
-          variants={fadeUp(3)}
+          variants={fadeUp(2)}
           initial="hidden"
           animate="visible"
           className="mt-10 flex flex-wrap justify-center gap-3 sm:gap-4"
