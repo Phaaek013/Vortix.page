@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
 
 /* ─── Content fade-up ─── */
@@ -27,15 +28,18 @@ type SpiralDecorProps = {
   size?: number;
   floatDuration?: number;
   floatDelay?: number;
-  /** initial rotation angle */
   initRotate?: number;
-  /** peak rotation at 50% of float loop */
   peakRotate?: number;
-  /** translate at 50% of float loop */
   floatX?: number;
   floatY?: number;
   opacity?: number;
   enterDelay?: number;
+  /** Size override on mobile (< 768px) */
+  mobileSize?: number;
+  /** Position override on mobile */
+  mobileStyle?: React.CSSProperties;
+  /** Hide completely on mobile */
+  hideOnMobile?: boolean;
 };
 
 function SpiralDecor({
@@ -49,9 +53,23 @@ function SpiralDecor({
   floatY = 14,
   opacity = 1,
   enterDelay = 0.3,
+  mobileSize,
+  mobileStyle,
+  hideOnMobile = false,
 }: SpiralDecorProps) {
   const mask =
     "radial-gradient(circle at center, #000 42%, rgba(0,0,0,0.92) 58%, transparent 82%)";
+
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const resolvedSize = isMobile && mobileSize ? mobileSize : size;
+  const resolvedStyle = isMobile && mobileStyle ? mobileStyle : style;
 
   return (
     <motion.div
@@ -63,13 +81,14 @@ function SpiralDecor({
         ease: [0.23, 0.86, 0.39, 0.96],
         opacity: { duration: 1.4 },
       }}
+      className={hideOnMobile ? "hidden md:block" : undefined}
       style={{
         position: "absolute",
-        width: size,
-        height: size,
+        width: resolvedSize,
+        height: resolvedSize,
         pointerEvents: "none",
         willChange: "transform",
-        ...style,
+        ...resolvedStyle,
       }}
     >
       <motion.div
@@ -118,7 +137,7 @@ export default function Hero() {
 
       {/* ── Spiral instances ── */}
 
-      {/* TOP-LEFT — large, enters first */}
+      {/* TOP-LEFT — desktop large / mobile small tucked off-screen */}
       <SpiralDecor
         size={480}
         enterDelay={0.2}
@@ -130,9 +149,11 @@ export default function Hero() {
         floatY={18}
         opacity={0.72}
         style={{ top: "8%", left: "-8%" }}
+        mobileSize={200}
+        mobileStyle={{ top: "2%", left: "-18%" }}
       />
 
-      {/* TOP-RIGHT — medium */}
+      {/* TOP-RIGHT — hide on mobile (overlaps headline) */}
       <SpiralDecor
         size={340}
         enterDelay={0.42}
@@ -144,9 +165,11 @@ export default function Hero() {
         floatY={12}
         opacity={0.58}
         style={{ top: "6%", right: "-4%" }}
+        mobileSize={160}
+        mobileStyle={{ top: "2%", right: "-20%" }}
       />
 
-      {/* BOTTOM-RIGHT — large, main accent */}
+      {/* BOTTOM-RIGHT — desktop large / mobile reduced */}
       <SpiralDecor
         size={460}
         enterDelay={0.32}
@@ -158,9 +181,11 @@ export default function Hero() {
         floatY={-16}
         opacity={0.78}
         style={{ bottom: "4%", right: "-6%" }}
+        mobileSize={220}
+        mobileStyle={{ bottom: "2%", right: "-22%" }}
       />
 
-      {/* BOTTOM-LEFT — small */}
+      {/* BOTTOM-LEFT — hide on mobile */}
       <SpiralDecor
         size={260}
         enterDelay={0.55}
@@ -172,9 +197,10 @@ export default function Hero() {
         floatY={-14}
         opacity={0.44}
         style={{ bottom: "10%", left: "4%" }}
+        hideOnMobile
       />
 
-      {/* TOP-CENTER-RIGHT — tiny, high up */}
+      {/* TOP-CENTER-RIGHT — hide on mobile */}
       <SpiralDecor
         size={190}
         enterDelay={0.68}
@@ -186,6 +212,7 @@ export default function Hero() {
         floatY={16}
         opacity={0.32}
         style={{ top: "3%", right: "22%" }}
+        hideOnMobile
       />
 
       {/* ── Text content ── */}

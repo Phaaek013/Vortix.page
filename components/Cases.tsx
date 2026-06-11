@@ -145,9 +145,9 @@ export default function Cases() {
 
         <motion.div
           {...reveal(0.4)}
-          className="mt-4 flex items-center justify-center rounded-2xl border border-dashed border-white/[0.06] py-10"
+          className="mt-4 flex items-center justify-center rounded-2xl border border-dashed border-white/[0.10] py-8"
         >
-          <p className="font-body text-[14px] text-slate/30">
+          <p className="font-body text-[14px] text-slate/50">
             Mais cases em breve — novos projetos em andamento.
           </p>
         </motion.div>
